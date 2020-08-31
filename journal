@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+
+###
+# Simple journal script to write journal entries through the terminal
+# The script accepts three different arguments:
+# Options:
+#   --help: show this help
+#   --add <string>: will add a timestamped string to a previously compiled file:
+#   --compile: will compile all the entries to one .md and a .pdf file
+#   --read: will open the last compiled file
+#####
+
+# Directory with all the journal's data
+WD="./test"
+
+h="
+ $(basename "$0") [--add][--compile][--read]
+
+ Simple journal script to write journal entries through the terminal
+ The script accepts three different arguments:
+ 
+ Options:
+
+	 --help: show this help
+	 --add <string>: will add a timestamped string to a previously compiled file:
+	 --compile: will compile all the entries to one .md and a .pdf file
+	 --read: will open the last compiled file
+"
+
+hour(){
+printf "$(date +%H:%M)"
+}
+
+day(){
+printf "$(date +%Y-%m-%d)"
+}
+
+dayname(){
+printf "$(date +%A)"
+}
+
+monthname(){
+printf "$(date +%B)"
+}
+
+
+# Make the working directory if it doesn't exist, also the directory where all the entries are kept
+mkdir $WD 2> /dev/null
+mkdir $WD/entries 2> /dev/null
+
+case $1 in
+	"--add")
+		# Addition of new entries.
+		#  First of, the script adds a string with a timestamp to the entry file,
+		#   then it adds the entry and after it two lineskips to fit the md format
+		#  It also checks if the first line is that of the day, if it isn't it adds it
+		
+		file="$WD/entries/$(day).md"
+		printf "\n#### $(hour)\n\n" >> "$file"
+		printf "$2\n\n" >> "$file"
+		read -r firstline<"$file"
+		
+		# If the first line of the file isn't the day, then make it be the first line
+		if [ "$firstline" != "### $(dayname) $(day)" ];then
+			printf "### $(dayname) $(day)\n\n$(cat $file)\n" > "$file"
+		fi
+		;;
+
+	"--compile")
+		# If the first arg is 'compile' it will run through all the files on the 'entries' folder and compile them to .md file and a .pdf one
+		# Compiles the data to a markdown file,
+		#  while it compiles de data,
+		#  first of all it checks if it's the first entry of a year
+		#   if the opened file is the first one of an year (by checking
+		#   the first 4 characters of the file with a previously defined
+		#   year_aux corresponding to the previous file first 4 characters)
+		#   it will add the string "# Year: $year\n\n",
+		#   similar processing happens with months.
+
+		# Definition of auxiliar variables
+		(year_aux=0
+		month_aux=0
+		    
+		# Enter the entries folder and iteration over each file that's in there
+		# cd "$WD/entries/"
+		
+		for entry in $(ls "$WD/entries/")
+		do
+		# Definition of year and month variables that are checked later
+		year=${entry:0:4}
+		month=${entry:5:2}
+
+		if [ $year != $year_aux ];then
+			printf "# Year: $year\n\n"
+			year_aux=$year
+		fi
+
+		if [ $month != $month_aux ];then
+			printf "## Month: $(monthname)\n\n"
+			month_aux=$month
+		fi
+		cat "$WD/entries/$entry"
+		done) > $WD/journal.md
+	
+		# Convert the .md file to pdf and then open it with the default application
+		pandoc "$WD/journal.md" -o "$WD/journal.pdf"
+		xdg-open "$WD/journal.pdf" &
+		;;
+
+	"--read")
+		# If the first arg is just 'read' then the script will look for the compiled file.
+		# Opens a previously compiled file with
+		#  the default application
+		xdg-open $WD/journal.pdf &
+		;;
+
+	"--help")
+		echo "$h"
+esac
