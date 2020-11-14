@@ -8,8 +8,11 @@ With `journal --add "<entry>"` an entry will be added to a file, for each day a 
 
 All the entries are saved in markdown format, and with `journal --compile` all the files will be compiled to a single `journal.md` and a `journal.pdf` files. With `journal --read` you can also open the last `journal.pdf` file made without compiling
 
+![](./vids/journal.gif)
+
+
 ## Dependencies
-> `pandoc`: To making a .pdf, could be bypassed.
+> `pandoc`: To make a .pdf file, could be bypassed.
 
 **Inputs**
 - `journal --add "<entry>"`
