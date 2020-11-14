@@ -47,8 +47,8 @@ monthname(){
 
 
 # Make the working directory if it doesn't exist, also the directory where all the entries are kept
-mkdir $WD 2> /dev/null
-mkdir $WD/entries 2> /dev/null
+mkdir -p $WD
+mkdir -p $WD/entries
 
 case $1 in
 	"--add")
