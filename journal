@@ -10,8 +10,9 @@
 #   --read: will open the last compiled file
 #####
 
+## USER'S VARIABLES
 # Directory with all the journal's data
-WD="./test"
+WD="$HOME/.local/share/journal/"
 
 h="
  $(basename "$0") [--add][--compile][--read]
@@ -28,19 +29,20 @@ h="
 "
 
 hour(){
-printf "$(date +%H:%M)"
+	printf "$(date +%H:%M)"
 }
 
 day(){
-printf "$(date +%Y-%m-%d)"
+	printf "$(date +%Y-%m-%d)"
 }
 
 dayname(){
-printf "$(date +%A)"
+	printf "$(date +%A)"
 }
 
 monthname(){
-printf "$(date +%B)"
+	d=$(echo $1 | tr -s "-" "/")
+	printf "$(date --date="${d%.*}" +%B)"
 }
 
 
@@ -96,7 +98,7 @@ case $1 in
 		fi
 
 		if [ $month != $month_aux ];then
-			printf "## Month: $(monthname)\n\n"
+			printf "## Month: $(monthname $entry)\n\n"
 			month_aux=$month
 		fi
 		cat "$WD/entries/$entry"
@@ -114,6 +116,6 @@ case $1 in
 		xdg-open $WD/journal.pdf &
 		;;
 
-	"--help")
+	*)
 		echo "$h"
 esac
