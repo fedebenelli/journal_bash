@@ -10,10 +10,13 @@ All the entries are saved in markdown format, and with `journal --compile` all t
 
 ![](./vids/journal.gif)
 
-
 ## Dependencies
 > `pandoc`: To make a .pdf file, could be bypassed.
 
 **Inputs**
 - `journal --add "<entry>"`
 - `journal --compile`
+
+## Instalation
+
+just run `make install` for installing or `make uninstall` for you guess what.
